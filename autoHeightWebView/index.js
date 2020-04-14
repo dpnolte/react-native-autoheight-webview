@@ -12,7 +12,7 @@ import { reduceData, getWidth, isSizeChanged, shouldUpdate } from './utils';
 
 const AutoHeightWebView = React.memo(
   forwardRef((props, ref) => {
-    const { style, onMessage, onSizeUpdated, scrollEnabledWithZoomedin, scrollEnabled } = props;
+    const { style, onMessage, onSizeUpdated, scrollEnabledWithZoomedin, scrollEnabled, WebElement } = props;
 
     let webView = useRef();
     useImperativeHandle(ref, () => ({
@@ -20,15 +20,15 @@ const AutoHeightWebView = React.memo(
       goForward: () => webView.current.goForward(),
       goBack: () => webView.current.goBack(),
       reload: () => webView.current.reload(),
-      injectJavaScript: script => webView.current.injectJavaScript(script)
+      injectJavaScript: (script) => webView.current.injectJavaScript(script),
     }));
 
     const [size, setSize] = useState({
       height: style && style.height ? style.height : 0,
-      width: getWidth(style)
+      width: getWidth(style),
     });
     const [scrollable, setScrollable] = useState(false);
-    const handleMessage = event => {
+    const handleMessage = (event) => {
       onMessage && onMessage(event);
       if (!event.nativeEvent) {
         return;
@@ -47,7 +47,7 @@ const AutoHeightWebView = React.memo(
       isSizeChanged({ height, previousHeight, width, previousWidth }) &&
         setSize({
           height,
-          width
+          width,
         });
     };
 
@@ -61,13 +61,13 @@ const AutoHeightWebView = React.memo(
         onSizeUpdated &&
         onSizeUpdated({
           height,
-          width
+          width,
         }),
       [width, height, onSizeUpdated]
     );
 
     return (
-      <WebView
+      <WebElement
         {...props}
         ref={webView}
         onMessage={handleMessage}
@@ -75,9 +75,9 @@ const AutoHeightWebView = React.memo(
           styles.webView,
           {
             width,
-            height
+            height,
           },
-          style
+          style,
         ]}
         injectedJavaScript={script}
         source={currentSource}
@@ -94,7 +94,7 @@ AutoHeightWebView.propTypes = {
     PropTypes.shape({
       href: PropTypes.string,
       type: PropTypes.string,
-      rel: PropTypes.string
+      rel: PropTypes.string,
     })
   ),
   style: ViewPropTypes.style,
@@ -106,31 +106,33 @@ AutoHeightWebView.propTypes = {
   originWhitelist: PropTypes.arrayOf(PropTypes.string),
   onMessage: PropTypes.func,
   scalesPageToFit: PropTypes.bool,
-  source: PropTypes.object
+  source: PropTypes.object,
+  WebElement: PropTypes.object,
 };
 
 let defaultProps = {
   showsVerticalScrollIndicator: false,
   showsHorizontalScrollIndicator: false,
-  originWhitelist: ['*']
+  WebElement: WebView,
+  originWhitelist: ['*'],
 };
 
 Platform.OS === 'android' &&
   Object.assign(defaultProps, {
-    scalesPageToFit: false
+    scalesPageToFit: false,
   });
 
 Platform.OS === 'ios' &&
   Object.assign(defaultProps, {
-    viewportContent: 'width=device-width'
+    viewportContent: 'width=device-width',
   });
 
 AutoHeightWebView.defaultProps = defaultProps;
 
 const styles = StyleSheet.create({
   webView: {
-    backgroundColor: 'transparent'
-  }
+    backgroundColor: 'transparent',
+  },
 });
 
 export default AutoHeightWebView;

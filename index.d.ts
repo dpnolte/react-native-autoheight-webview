@@ -27,6 +27,7 @@ export interface AutoHeightWebViewProps extends WebViewProps {
   customStyle: string;
   viewportContent: string;
   scrollEnabledWithZoomedin: boolean;
+  WebElement?: React.ElementType<WebViewProps>;
 }
 
 export default class AutoHeightWebView extends Component<Partial<AutoHeightWebViewProps>> {}
